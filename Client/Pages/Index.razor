@@ -1,0 +1,69 @@
+﻿@page "/"
+@using BlzrHstWasm.Shared;
+@using BlzrHstWasm.Shared.ViewModels;
+@using BlzrHstWasm.Client.Components;
+@using BlzrHstWasm.Client.StateContainers;
+@inject OverlayStateContainer overlayState;
+
+
+
+<div class="container">
+
+    <h4>Some sturf</h4>
+
+    <SomeComponent Word="@randomWord" />
+    @if (overlayState.Active)
+    {
+
+        <div>Hey, it's active.</div>
+    }
+    else
+    {
+
+        <div>Not active.</div>
+    }
+
+    <div>Resize Listener Active: @isAttached</div>
+    <button @onclick="ToggleWindowListener">Toggle Window Listener</button>
+
+</div>
+
+
+
+@code {
+    private string randomWord = "jenga";
+    private bool isAttached;
+    protected override void OnInitialized()
+    {
+        overlayState.OnChange += StateHasChanged;
+        overlayState.AttachWindowListener();
+        isAttached = true;
+        Console.WriteLine("Index::Initialized()");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            return;
+
+        Console.WriteLine("Index::OnAfterRender()");
+    }
+
+
+
+    public void Dispose()
+    {
+        overlayState.OnChange -= StateHasChanged;
+    }
+
+    public void ToggleWindowListener()
+    {
+        if(isAttached) {
+            overlayState.DetachWindowListener();
+        } else {
+            overlayState.AttachWindowListener();
+        }
+        isAttached = !isAttached;
+    }
+
+}
